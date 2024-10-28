@@ -31,6 +31,47 @@ import re
 from torchvision.transforms import ToPILImage
 import supervision as sv
 import torchvision.transforms as T
+from langdetect import detect
+from spellchecker import SpellChecker
+
+
+def preprocess_image(image):
+    # Convert to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Denoise the image
+    denoised = cv2.fastNlMeansDenoising(gray, None, 30, 7, 21)
+    # Adjust contrast
+    contrast_enhanced = cv2.convertScaleAbs(denoised, alpha=1.5, beta=0)
+    return contrast_enhanced
+
+
+def integrate_ocr_engines(image):
+    reader_easyocr = easyocr.Reader(['en'])
+    reader_tesseract = pytesseract
+
+    # Perform OCR with EasyOCR
+    result_easyocr = reader_easyocr.readtext(image)
+    text_easyocr = [item[1] for item in result_easyocr]
+
+    # Perform OCR with Tesseract
+    result_tesseract = reader_tesseract.image_to_string(image)
+    text_tesseract = result_tesseract.split('\n')
+
+    # Combine results
+    combined_text = list(set(text_easyocr + text_tesseract))
+    return combined_text
+
+
+def detect_language(text):
+    return detect(text)
+
+
+def post_process_text(text):
+    spell = SpellChecker()
+    corrected_text = []
+    for word in text.split():
+        corrected_text.append(spell.correction(word))
+    return ' '.join(corrected_text)
 
 
 def get_caption_model_processor(model_name, model_name_or_path="Salesforce/blip2-opt-2.7b", device=None):
@@ -372,15 +413,16 @@ def get_xywh_yolo(input):
 def check_ocr_box(image_path, display_img = True, output_bb_format='xywh', goal_filtering=None, easyocr_args=None):
     if easyocr_args is None:
         easyocr_args = {}
-    result = reader.readtext(image_path, **easyocr_args)
+    image = cv2.imread(image_path)
+    preprocessed_image = preprocess_image(image)
+    result = reader.readtext(preprocessed_image, **easyocr_args)
     is_goal_filtered = False
     # print('goal filtering pred:', result[-5:])
     coord = [item[0] for item in result]
     text = [item[1] for item in result]
     # read the image using cv2
     if display_img:
-        opencv_img = cv2.imread(image_path)
-        opencv_img = cv2.cvtColor(opencv_img, cv2.COLOR_RGB2BGR)
+        opencv_img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         bb = []
         for item in coord:
             x, y, a, b = get_xywh(item)
@@ -397,6 +439,3 @@ def check_ocr_box(image_path, display_img = True, output_bb_format='xywh', goal_
             bb = [get_xyxy(item) for item in coord]
         # print('bounding box!!!', bb)
     return (text, bb), is_goal_filtered
-
-
-
