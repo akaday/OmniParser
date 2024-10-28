@@ -39,6 +39,37 @@ To run gradio demo, simply run:
 python gradio_demo.py
 ```
 
+## Running demo.ipynb
+To run the cells in `demo.ipynb` and verify everything is working as expected, follow these steps:
+
+1. Open the `demo.ipynb` file in Jupyter Notebook or JupyterLab.
+2. Run each cell sequentially by clicking on the "Run" button or pressing `Shift + Enter`.
+3. Verify the output of each cell to ensure it matches the expected results.
+
+## Debugging Jupyter Notebooks
+To debug Jupyter notebooks effectively, you can use the following tools and techniques:
+
+1. **Built-in Debugging Tools**:
+   - Use the `%debug` magic command to enter the interactive debugger.
+   - Use the `print` function to display variable values and track the flow of execution.
+   - Leverage the `pdb` module to set breakpoints and step through the code.
+
+2. **Organize and Structure Your Code**:
+   - Break down your code into smaller, manageable cells to isolate issues more easily.
+   - Use comments and markdown cells to document your code and explain the logic.
+   - Ensure that each cell performs a specific task and avoid having too much code in a single cell.
+
+3. **Use External Tools and Libraries**:
+   - Use external libraries like `ipdb` for an enhanced debugging experience.
+   - Leverage visualization libraries like `matplotlib` or `seaborn` to plot data and identify issues visually.
+   - Utilize tools like `nbdime` to compare and merge notebook files, which can help identify changes that introduced bugs.
+
+## Verifying Functionality
+After running the cells in `demo.ipynb`, you can verify if everything is working as expected by checking the following:
+
+1. Ensure that the outputs of the cells match the expected results.
+2. Check for any error messages or warnings in the notebook.
+3. Verify that the functionality demonstrated in the notebook aligns with the intended behavior of the repository.
 
 ## 📚 Citation
 Our technical report can be found [here](https://arxiv.org/abs/2408.00203).
